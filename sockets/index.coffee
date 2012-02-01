@@ -30,7 +30,9 @@ sockets = (io, db) ->
       req.end()
 
     socket.on 'share', (data) ->
-      data.name = data.name.substr 0, 30
+      error = 'Name Your Stack Correctly'
+      return socket.emit 'error', error unless data? and data.name?
+      return socket.emit 'error', error unless String(data.name).length < 30
       db.create data, (err, stack) ->
         upvotes[stack._id] = []
         dnvotes[stack._id] = []
@@ -39,6 +41,9 @@ sockets = (io, db) ->
           io.sockets.in('topStacks').emit 'topStack', stacks
 
     socket.on 'upvote', (id) ->
+      error =
+        attack: "window.location = 'https://www.google.com/search?q=dont+hack+me+bro'"
+      return socket.emit 'error', error if id?
       unless socket.handshake.address in upvotes[id]
         upvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
@@ -48,11 +53,14 @@ sockets = (io, db) ->
             db.findSort (err, stacks) ->
               io.sockets.in('topStacks').emit 'topStack', stacks
       else
-        socket.emit 'error',
+        socket.emit 'voteError',
           id: id
           msg: 'You Already Up-Voted This'
 
     socket.on 'dnvote', (id) ->
+      error =
+        attack: "window.location = 'https://www.google.com/search?q=dont+hack+me+bro'"
+      return socket.emit 'error', error if id?
       unless socket.handshake.address in dnvotes[id]
         dnvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
@@ -62,7 +70,7 @@ sockets = (io, db) ->
             db.findSort (err, stacks) ->
               io.sockets.in('topStacks').emit 'topStack', stacks
       else
-        socket.emit 'error',
+        socket.emit 'voteError',
           id: id
           msg: 'You Already Down-Voted This'
 

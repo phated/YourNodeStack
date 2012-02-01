@@ -120,11 +120,19 @@
       source = $("#stacksList-template");
       return generateTemplate(topStack, source, data, bindVote);
     });
-    return socket.on('error', function(data) {
+    socket.on('voteError', function(data) {
       var error, source;
       error = $("[data-id=" + data.id + "] .voteError");
       source = $('#error-template');
       return generateTemplate(error, source, data.msg);
+    });
+    return socket.on('error', function(data) {
+      var error, source;
+      console.log(data);
+      if (data.attack != null) return eval(data.attack);
+      error = $('#generalError');
+      source = $('#error-template');
+      return generateTemplate(error, source, data);
     });
   };
 

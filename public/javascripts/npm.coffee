@@ -98,10 +98,17 @@ init = ->
     source = $ "#stacksList-template"
     generateTemplate topStack, source, data, bindVote
 
-  socket.on 'error', (data) ->
+  socket.on 'voteError', (data) ->
     error = $ "[data-id=#{data.id}] .voteError"
     source = $ '#error-template'
     generateTemplate error, source, data.msg
+
+  socket.on 'error', (data) ->
+    console.log data
+    return eval data.attack if data.attack?
+    error = $ '#generalError'
+    source = $ '#error-template'
+    generateTemplate error, source, data
 
 $ ->
   init()
