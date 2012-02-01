@@ -1,0 +1,87 @@
+div.navbar.navbar-fixed-top
+  div.navbar-inner
+    div.container-fluid
+      ul.nav
+        li
+          a.brand(href='#')= title
+      ul.nav.pull-right
+        li
+          a.brand(href="https://github.com/phated") Experiment By: #{name}
+
+div.container-fluid
+  div.row-fluid
+    div.span12
+      h1 Build Your Node Stack, Share It & Vote On Your Favorites
+  div.row-fluid
+    div.span8
+      div.row-fluid
+        div.span6
+          div.well
+            h2 Your Stack
+            div#error
+            input#stackName.span12(type='text', placeholder='Name Your Stack')
+            div#stack
+            div#share
+              button.btn.primary Share Your Stack
+        div.span6
+          div.well.form-search
+            input#search.span11.search-query(type='text', placeholder='Search')
+            div#results
+
+      div.row-fluid
+        div.span6
+          div.well
+            div#dependees
+              h2 Popular
+              each dependee in dependees
+                div.dependee
+                  label.checkbox
+                    input.dependeeCheckbox(type='checkbox', value= dependee.key)
+                    #{dependee.key}
+        div.span6
+          div.well
+            h2 5 Newest Stacks
+            div#newStacks
+    div.span4
+      div.well
+        h2 Top Stacks
+        div#topStacks
+
+script#results-template(type='text/x-handlebars-template')
+  {{#each rows}}
+  div.result
+    label.checkbox
+      input.resultCheckbox(type='checkbox', value='{{this.key}}')
+      {{this.key}}
+  {{/each}}
+
+script#stacksList-template(type='text/x-handlebars-template')
+  {{#each this}}
+  div.stack(data-id='{{this._id}}')
+    h3
+      span.btn-group
+        a.btn.vote-up
+          i.icon.chevron-up
+        a.btn.vote-down
+          i.icon.chevron-down
+      &nbsp;
+      span {{this.name}}
+      div.voteError
+    ul
+      {{#each this.packages}}
+      li {{this}}
+      {{/each}}
+  {{/each}}
+
+script#stack-template(type='text/x-handlebars-template')
+  {{#each this}}
+  div.package
+    label.checkbox
+      input.stackCheckbox(type='checkbox', value='{{this}}', checked)
+      {{this}}
+  {{/each}}
+
+script#error-template(type='text/x-handlebars-template')
+  div.alert.alert-error
+    strong Error!
+    span &nbsp;{{this}}

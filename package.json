@@ -1,0 +1,16 @@
+{
+    "name": "YourNodeStack"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      "express": "2.5.5"
+    , "jade": ">= 0.0.1"
+    , "coffee-script": "*"
+    , "hooks": "*"
+    , "mongodb": "*"
+    , "mongoose": "*"
+    , "socket.io": "*"
+    , "socket.io-client": "*"
+    , "uglify-js": "*"
+  }
+}
