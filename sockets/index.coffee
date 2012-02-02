@@ -51,7 +51,7 @@ sockets = (io, db) ->
           io.sockets.in('topStacks').emit 'topStack', stacks
 
     socket.on 'upvote', (id) ->
-      return socket.emit 'error', attackError if id?
+      return socket.emit 'error', attackError unless id? and upvotes[id]?
       unless socket.handshake.address in upvotes[id]
         upvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
@@ -66,7 +66,7 @@ sockets = (io, db) ->
           msg: 'You Already Up-Voted This'
 
     socket.on 'dnvote', (id) ->
-      return socket.emit 'error', attackError if id?
+      return socket.emit 'error', attackError unless id? and dnvotes[id]?
       unless socket.handshake.address in dnvotes[id]
         dnvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
