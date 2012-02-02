@@ -1,6 +1,16 @@
 http = require 'http'
 querystring = require 'querystring'
 
+attackError =
+  attack: "window.location = 'https://www.google.com/search?q=dont+hack+me+bro'"
+
+niceError = 'Name Your Stack Correctly'
+
+rooms = [
+  'newStacks'
+  'topStacks'
+]
+
 sockets = (io, db) ->
   # Request Options
   request_options =
@@ -30,9 +40,9 @@ sockets = (io, db) ->
       req.end()
 
     socket.on 'share', (data) ->
-      error = 'Name Your Stack Correctly'
-      return socket.emit 'error', error unless data? and data.name?
-      return socket.emit 'error', error unless String(data.name).length < 30
+      return socket.emit 'error', attackError unless data? and data.name? and data.packages? and data.upVote? and data.dnVote? and data.score?
+      return socket.emit 'error', attackError unless data.upVote is 0 and data.dnVote is 0 and data.score is 0
+      return socket.emit 'error', niceError unless String(data.name).length < 30
       db.create data, (err, stack) ->
         upvotes[stack._id] = []
         dnvotes[stack._id] = []
@@ -41,9 +51,7 @@ sockets = (io, db) ->
           io.sockets.in('topStacks').emit 'topStack', stacks
 
     socket.on 'upvote', (id) ->
-      error =
-        attack: "window.location = 'https://www.google.com/search?q=dont+hack+me+bro'"
-      return socket.emit 'error', error if id?
+      return socket.emit 'error', attackError if id?
       unless socket.handshake.address in upvotes[id]
         upvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
@@ -58,9 +66,7 @@ sockets = (io, db) ->
           msg: 'You Already Up-Voted This'
 
     socket.on 'dnvote', (id) ->
-      error =
-        attack: "window.location = 'https://www.google.com/search?q=dont+hack+me+bro'"
-      return socket.emit 'error', error if id?
+      return socket.emit 'error', attackError if id?
       unless socket.handshake.address in dnvotes[id]
         dnvotes[id].push socket.handshake.address
         db.findById id, (err, stack) ->
@@ -75,6 +81,7 @@ sockets = (io, db) ->
           msg: 'You Already Down-Voted This'
 
     socket.on 'join', (room) ->
+      return socket.emit 'error', attackError unless room in rooms
       console.log "joined room: #{room}"
       socket.join room
       db.findSort (err, stacks) ->
